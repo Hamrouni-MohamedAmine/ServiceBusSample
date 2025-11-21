@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ServiceBusSample.QueueProcessor": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7011",
+      "launchBrowser": false
+    }
+  }
+}

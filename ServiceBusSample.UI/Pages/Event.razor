@@ -1,0 +1,55 @@
+﻿@page "/send-event"
+@inject IHttpClientFactory ClientFactory
+
+<div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light">
+    <div class="card shadow-sm p-4" style="width: 400px;">
+        <h3 class="text-center mb-3">Service Bus Sample</h3>
+
+        <div class="mb-3">
+            <label class="form-label">Order Id</label>
+            <input @bind="orderId" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Amount</label>
+            <input @bind="amount" type="number" step="0.01" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Customer Id</label>
+            <input @bind="customerId" class="form-control" />
+        </div>
+
+        <button @onclick="SendEvents">
+            Send to Queue
+        </button>
+
+        <p class="text-center mt-3 text-muted">@status</p>
+    </div>
+</div>
+
+@code {
+    private string orderId = Guid.NewGuid().ToString();
+    private decimal amount = 99.95m;
+    private string customerId = "CUST-123";
+    private string status = "";
+
+    private async Task SendEvents()
+    {
+        try
+        {
+            status = "Clicked!";
+            var client = ClientFactory.CreateClient("Api");
+            var response = await client.PostAsJsonAsync("/events/orders", new { OrderId = "123" });
+            status = response.IsSuccessStatusCode
+           ? "✅ Event enqueued successfully!"
+           : $"❌ Failed: {response.StatusCode}";
+        }
+        catch (Exception ex)
+        {
+            status = $"Error: {ex.Message}";
+        }
+    }
+
+    public record OrderCreatedEvent(string OrderId, decimal Amount, string CustomerId, DateTime CreatedUtc);
+}
